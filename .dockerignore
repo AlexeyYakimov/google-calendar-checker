@@ -1,0 +1,36 @@
+# Git and IDE
+.git
+.gitignore
+.vscode
+.idea
+
+# Python
+__pycache__
+*.py[cod]
+*$py.class
+*.so
+venv/
+env/
+*.egg-info
+.eggs/
+
+# Sensitive — mount at runtime
+.env
+calendar_checker/credentials.json
+calendar_checker/token.json
+
+# Generated at runtime
+events_cache.json
+*.log
+
+# Docs and tests (not needed in runtime image)
+docs/
+tests/
+*.md
+!notifier/README.md
+
+# Other
+Dockerfile
+.dockerignore
+_old_*.py
+.DS_Store
