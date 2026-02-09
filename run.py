@@ -14,9 +14,11 @@
 import logging
 import signal
 import sys
+import time
 from threading import Thread
 
 from calendar_checker.scheduler import CalendarPoller
+from calendar_checker.cache import is_cache_fresh
 from calendar_checker.config import POLL_START_HOUR, POLL_END_HOUR, POLL_INTERVAL_MINUTES
 from notifier import EventNotifier
 from notifier.config import WEBHOOK_URL, TIMEZONE, HTTP_TIMEOUT
@@ -89,6 +91,16 @@ class CalendarService:
         logger.info("Запуск Calendar Poller в фоновом потоке...")
         self.poller_thread = Thread(target=self.poller.start, daemon=True)
         self.poller_thread.start()
+        
+        # Дождаться первого обновления кэша, чтобы notifier не стартовал по старому кэшу
+        logger.info("Ожидание первого опроса календаря (до 30 сек)...")
+        for _ in range(15):
+            time.sleep(2)
+            if is_cache_fresh(max_age_seconds=60):
+                logger.info("Кэш обновлён, запуск Notifier.")
+                break
+        else:
+            logger.info("Таймаут ожидания кэша, запуск Notifier (возможен старый/пустой кэш).")
         
         # Запустить notifier в главном потоке (блокирующий)
         logger.info("Запуск Event Notifier...")

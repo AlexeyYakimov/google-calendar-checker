@@ -28,6 +28,7 @@ ENV/
 # Google Calendar API credentials
 credentials.json
 token.json
+secrets/
 
 # Environment variables (contains sensitive data)
 .env

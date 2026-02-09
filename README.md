@@ -4,6 +4,31 @@ Service that connects Google Calendar to Home Assistant: polls the calendar on a
 
 **Docs:** [docs/DOCUMENTATION.md](docs/DOCUMENTATION.md) · **Architecture:** [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
 
+## Docker
+
+Put `credentials.json` and `token.json` in the **project root**. Create them before the first run (otherwise Docker will create directories instead of files).
+
+```bash
+# After python setup.py, copy to root for Docker
+cp calendar_checker/credentials.json calendar_checker/token.json .
+
+# Build & run
+docker build -t google-calendar-checker .
+docker run --rm -it \
+  -v "$(pwd)/credentials.json:/app/calendar_checker/credentials.json" \
+  -v "$(pwd)/token.json:/app/calendar_checker/token.json" \
+  --env-file .env \
+  google-calendar-checker
+```
+
+Or use Docker Compose:
+
+```bash
+docker compose up -d
+```
+
+---
+
 ## Features
 
 - **Polling**: Poll calendar at :00 and :30 of each hour (configurable)
@@ -129,30 +154,6 @@ Run with logs to file:
 ```bash
 python run.py > service.log 2>&1
 ```
-
-## Docker
-
-Put `credentials.json` and `token.json` in the **project root**; Compose mounts them into the container.
-
-```bash
-# Build
-docker build -t google-calendar-checker .
-
-# Run — credentials & token from project root, .env as env vars
-docker run --rm -it \
-  -v "$(pwd)/credentials.json:/app/calendar_checker/credentials.json:ro" \
-  -v "$(pwd)/token.json:/app/calendar_checker/token.json:ro" \
-  --env-file .env \
-  google-calendar-checker
-```
-
-Or use Docker Compose:
-
-```bash
-docker compose up -d
-```
-
-**Note:** Run `python setup.py` once on the host. Then copy `calendar_checker/token.json` to project root as `token.json` (and `credentials.json` to root) for Docker, or keep them in root from the start.
 
 ## Requirements
 

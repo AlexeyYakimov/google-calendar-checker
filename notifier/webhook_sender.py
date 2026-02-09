@@ -2,6 +2,7 @@
 Модуль для отправки POST запросов в Home Assistant webhook
 """
 
+import json
 import logging
 import requests
 from typing import Dict, Any
@@ -35,8 +36,8 @@ class WebhookSender:
         Returns:
             True если отправка успешна, False в противном случае
         """
-        logger.info(f"Отправка POST запроса в: {self.webhook_url}")
-        logger.debug(f"Данные: {data}")
+        logger.info(f"Отправка POST в webhook: {self.webhook_url}")
+        logger.info(f"Notifier отправил: {json.dumps(data, ensure_ascii=False)}")
         
         try:
             response = requests.post(
@@ -46,7 +47,7 @@ class WebhookSender:
             )
             
             if response.status_code == 200:
-                logger.info(f"✓ Успешно отправлено (status: {response.status_code})")
+                logger.info(f"✓ Webhook ответил 200, сообщение доставлено")
                 return True
             else:
                 logger.warning(f"⚠ Webhook вернул статус: {response.status_code}")

@@ -4,6 +4,30 @@
 
 ---
 
+## Docker
+
+Положите **`credentials.json`** и **`token.json`** в корень проекта; они монтируются в контейнер в `/app/calendar_checker/`. Создайте файлы до первого запуска (иначе Docker создаст каталоги с такими именами).
+
+```bash
+# Один раз на хосте: python setup.py, затем скопировать в корень
+cp calendar_checker/credentials.json calendar_checker/token.json .
+
+docker build -t google-calendar-checker .
+docker run --rm -it \
+  -v "$(pwd)/credentials.json:/app/calendar_checker/credentials.json" \
+  -v "$(pwd)/token.json:/app/calendar_checker/token.json" \
+  --env-file .env \
+  google-calendar-checker
+```
+
+Или через Docker Compose (из корня проекта):
+
+```bash
+docker compose up -d
+```
+
+---
+
 ## Быстрый старт
 
 ### 1. Установка
@@ -130,30 +154,6 @@ python tests/test_env_loading.py
 # Кэш событий
 python tests/test_cache.py
 ```
-
----
-
-## Docker
-
-Сборка и запуск:
-
-```bash
-docker build -t google-calendar-checker .
-docker run --rm -it \
-  -v "$(pwd)/calendar_checker:/app/calendar_checker:ro" \
-  --env-file .env \
-  google-calendar-checker
-```
-
-Или через Docker Compose (из корня проекта):
-
-```bash
-docker compose up -d
-```
-
-Файлы `credentials.json` и `token.json` кладите в **корень проекта**; в контейнер они монтируются в `/app/calendar_checker/`. Переменные окружения задаются через `.env` (`--env-file` или `env_file` в docker-compose).
-
-Один раз выполните `python setup.py` на хосте, затем скопируйте `calendar_checker/token.json` и `calendar_checker/credentials.json` в корень проекта (или сразу храните их в корне для Docker).
 
 ---
 

@@ -1,15 +1,16 @@
 # Google Calendar Checker — run as a service
-# Put credentials.json and token.json in project root; they are mounted into the container.
-# Create .env and run `python setup.py` once to get token.json before using Docker.
+# Put credentials.json and token.json in project root (create them before first run, else Docker creates dirs).
 
 services:
   calendar-checker:
     build: .
     restart: unless-stopped
     env_file: .env
+    environment:
+      - TIMEZONE=${TIMEZONE:-Europe/Moscow}
     volumes:
-      - ./credentials.json:/app/calendar_checker/credentials.json:ro
-      - ./token.json:/app/calendar_checker/token.json:ro
+      - ./credentials.json:/app/calendar_checker/credentials.json
+      - ./token.json:/app/calendar_checker/token.json
     # Optional: persist cache on host
     # volumes:
     #   - ./data/events_cache.json:/app/events_cache.json
