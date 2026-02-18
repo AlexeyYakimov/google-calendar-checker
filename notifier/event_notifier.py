@@ -109,7 +109,9 @@ class EventNotifier:
         
         start_dt_local = start_dt.astimezone(self.timezone)
         now = datetime.now(self.timezone)
-        if start_dt_local < now:
+        # Допуск 5 минут: не пропускаем события, которые начались совсем недавно
+        # (актуально при гонке poller/notifier на одном тике расписания)
+        if start_dt_local < now - timedelta(minutes=5):
             logger.info(f"Пропуск прошедшего события: {event_name} (начало в {start_dt_local.strftime('%H:%M')})")
             return
         
@@ -176,18 +178,19 @@ class EventNotifier:
         # Начальное обновление событий
         self.refresh_events()
         
-        # Запланировать периодическое обновление в :00 и :30 каждого часа
+        # Запланировать периодическое обновление в :03 и :33 (на 3 минуты позже poller'а,
+        # чтобы к моменту чтения кэш уже был обновлён)
         self.scheduler.add_job(
             self.refresh_events,
             'cron',
-            minute='0,30',
+            minute='3,33',
             id='refresh_events',
             replace_existing=True
         )
         
         current_time = datetime.now(self.timezone)
         logger.info(f"Текущее время: {current_time.strftime('%H:%M:%S')}")
-        logger.info("Обновление событий будет происходить в :00 и :30 каждого часа")
+        logger.info("Обновление событий будет происходить в :03 и :33 каждого часа")
         logger.info("=" * 60)
         logger.info("Планировщик запущен. Нажмите Ctrl+C для остановки.")
         logger.info("")
